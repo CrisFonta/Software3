@@ -19,6 +19,16 @@ namespace WebApplication1.Controllers
         {
             this.context = context;
         }
+        [HttpGet("login")]
+        public IActionResult Login([FromBody] Usuario usuarioData)
+        {
+            var usuario = context.Usuarios.Where(x => x.Contrasena == usuarioData.Contrasena).Where(x => x.UsuarioLogin == usuarioData.UsuarioLogin).FirstOrDefault();
+            if (usuario!=null)
+            {
+                return Ok(usuario);
+            }
+            return NotFound();
+        }
         // GET: api/Usuario
         [HttpGet]
         public IEnumerable<Usuario> Get()
@@ -77,4 +87,5 @@ namespace WebApplication1.Controllers
             context.SaveChanges();
             return Ok(usuario);
         }
+    }
     }
