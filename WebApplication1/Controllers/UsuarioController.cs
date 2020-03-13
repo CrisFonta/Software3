@@ -19,6 +19,8 @@ namespace WebApplication1.Controllers
         {
             this.context = context;
         }
+        //WS consumido al momento de autenticar
+        //GET: api/Usuario/login
         [HttpGet("login")]
         public IActionResult Login([FromBody] Usuario usuarioData)
         {
@@ -29,13 +31,14 @@ namespace WebApplication1.Controllers
             }
             return NotFound();
         }
+        //WS consumido al momento de consultar la lista de usuarios
         // GET: api/Usuario
         [HttpGet]
         public IEnumerable<Usuario> Get()
         {
             return context.Usuarios.ToList();
         }
-
+        //WS consumido al momento de consultar un usuario por su identificador
         // GET: api/Usuario/5
         [HttpGet("{id}", Name = "GetUsuario")]
         public IActionResult GetUsuario(int id)
@@ -50,20 +53,27 @@ namespace WebApplication1.Controllers
                 return Ok(usuario);
             }
         }
-
+        //WS consumido al momento de registrar un usuario
         // POST: api/Usuario
         [HttpPost]
         public IActionResult AgregarUsuario([FromBody] Usuario usuario)
         {
             if (ModelState.IsValid)
             {
-                context.Usuarios.Add(usuario);
-                context.SaveChanges();
-                return new CreatedAtRouteResult("establecimientoCreado", new { id = usuario.Id }, usuario);
+                var user = context.Usuarios.FirstOrDefault(x => x.UsuarioLogin == usuario.UsuarioLogin);
+                if (user == null)
+                {
+                    context.Usuarios.Add(usuario);
+                    context.SaveChanges();
+                    return new CreatedAtRouteResult("establecimientoCreado", new { id = usuario.Id }, usuario);
+                }
+                return Conflict();
+                
             }
             return BadRequest(ModelState);
         }
-
+        //WS consumido al momento de modificar un usuario identificado por su id
+        // PUT: api/Usuario/1
         [HttpPut("{id}")]
         public IActionResult ActualizarUsuario([FromBody] Usuario usuario, int id)
         {
@@ -75,6 +85,8 @@ namespace WebApplication1.Controllers
             context.SaveChanges();
             return Ok();
         }
+        //WS consumido al momento de eliminar un usuario identificado por su id
+        // DELETE: api/Usuario/1
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
